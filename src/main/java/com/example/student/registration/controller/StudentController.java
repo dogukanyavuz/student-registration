@@ -8,6 +8,7 @@ import com.example.student.registration.service.StudentService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class StudentController {
 
     @PostMapping
     private @ResponseBody
-    Student createStudent(@RequestBody StudentDto studentDto) {
+    Student createStudent(@RequestBody @Valid StudentDto studentDto) {
         return studentService.createStudent(studentDto);
     }
 
