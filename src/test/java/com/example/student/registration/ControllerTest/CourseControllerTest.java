@@ -1,17 +1,14 @@
-package com.example.student.registration;
+package com.example.student.registration.ControllerTest;
 
-import com.example.student.registration.controller.StudentController;
-import com.example.student.registration.dto.StudentDto;
+import com.example.student.registration.controller.CourseController;
 import com.example.student.registration.entity.Course;
 import com.example.student.registration.entity.Student;
-import com.example.student.registration.repository.StudentRepository;
-import com.example.student.registration.service.StudentService;
+import com.example.student.registration.repository.CourseRepository;
+import com.example.student.registration.service.CourseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,17 +17,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers =StudentController.class)
-public class StudentControllerTest {
+@WebMvcTest(controllers = CourseController.class)
+public class CourseControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -38,23 +32,26 @@ public class StudentControllerTest {
     ObjectMapper mapper;
 
     @MockBean
-    StudentService studentService;
+    CourseRepository courseRepository;
 
     @MockBean
-    StudentRepository studentRepository;
+    CourseService courseService;
 
     @Test
-    public void createStudent_success() throws Exception {
-        Student student1 = Student.builder()
-                        .idStudent(2l).name("dogu").surname("yvz").build();
+    public void createCourse_success() throws Exception{
+        Course course = Course.builder()
+                .idCourse(1l)
+                .courseName("java")
+                .idStudent(1l)
+                .build();
 
-        Mockito.when(studentRepository.save(student1)).thenReturn(student1);
+        Mockito.when(courseRepository.save(course)).thenReturn(course);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .post("/student")
+                .post("/course")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(student1));
+                .content(this.mapper.writeValueAsString(course));
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk());
@@ -62,22 +59,22 @@ public class StudentControllerTest {
 
     @Test
     public void getAll_success() throws Exception{
-        Student student = Student.builder()
-                .idStudent(22l)
-                .name("ali")
-                .surname("duru")
+        Course course = Course.builder()
+                .idCourse(1l)
+                .courseName("java")
+                .idStudent(1l)
                 .build();
 
-        Mockito.when(studentService.getStudents()).thenReturn(Collections.singletonList(student));
+        Mockito.when(courseService.getCourses()).thenReturn(Collections.singletonList(course));
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/student/getAll")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .get("/course/getAll")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void getStudentByCourseName_success() throws Exception{
+    public void getCoursesByStudentId_success() throws Exception{
         Student student = Student.builder()
                 .idStudent(23l)
                 .name("kayacan")
@@ -90,10 +87,10 @@ public class StudentControllerTest {
                 .idCourse(1l)
                 .build();
 
-        Mockito.when(studentService.getStudentsByCourseName("java")).thenReturn(Collections.singletonList(student));
+        Mockito.when(courseService.getCoursesByStudentId(student.getIdStudent())).thenReturn(Collections.singletonList(course));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/java")
+                        .get("/course/23")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }

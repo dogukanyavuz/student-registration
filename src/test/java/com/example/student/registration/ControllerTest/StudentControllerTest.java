@@ -1,11 +1,10 @@
-package com.example.student.registration;
+package com.example.student.registration.ControllerTest;
 
-import com.example.student.registration.controller.CourseController;
 import com.example.student.registration.controller.StudentController;
 import com.example.student.registration.entity.Course;
 import com.example.student.registration.entity.Student;
-import com.example.student.registration.repository.CourseRepository;
-import com.example.student.registration.service.CourseService;
+import com.example.student.registration.repository.StudentRepository;
+import com.example.student.registration.service.StudentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +23,8 @@ import java.util.Collections;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = CourseController.class)
-public class CourseControllerTest {
+@WebMvcTest(controllers =StudentController.class)
+public class StudentControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -33,26 +32,23 @@ public class CourseControllerTest {
     ObjectMapper mapper;
 
     @MockBean
-    CourseRepository courseRepository;
+    StudentService studentService;
 
     @MockBean
-    CourseService courseService;
+    StudentRepository studentRepository;
 
     @Test
-    public void createCourse_success() throws Exception{
-        Course course = Course.builder()
-                .idCourse(1l)
-                .courseName("java")
-                .idStudent(1l)
-                .build();
+    public void createStudent_success() throws Exception {
+        Student student1 = Student.builder()
+                        .idStudent(2l).name("dogu").surname("yvz").build();
 
-        Mockito.when(courseRepository.save(course)).thenReturn(course);
+        Mockito.when(studentRepository.save(student1)).thenReturn(student1);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .post("/course")
+                .post("/student")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(course));
+                .content(this.mapper.writeValueAsString(student1));
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk());
@@ -60,22 +56,22 @@ public class CourseControllerTest {
 
     @Test
     public void getAll_success() throws Exception{
-        Course course = Course.builder()
-                .idCourse(1l)
-                .courseName("java")
-                .idStudent(1l)
+        Student student = Student.builder()
+                .idStudent(22l)
+                .name("ali")
+                .surname("duru")
                 .build();
 
-        Mockito.when(courseService.getCourses()).thenReturn(Collections.singletonList(course));
+        Mockito.when(studentService.getStudents()).thenReturn(Collections.singletonList(student));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/course/getAll")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .get("/student/getAll")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void getCoursesByStudentId_success() throws Exception{
+    public void getStudentByCourseName_success() throws Exception{
         Student student = Student.builder()
                 .idStudent(23l)
                 .name("kayacan")
@@ -88,10 +84,10 @@ public class CourseControllerTest {
                 .idCourse(1l)
                 .build();
 
-        Mockito.when(courseService.getCoursesByStudentId(student.getIdStudent())).thenReturn(Collections.singletonList(course));
+        Mockito.when(studentService.getStudentsByCourseName("java")).thenReturn(Collections.singletonList(student));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/course/23")
+                        .get("/student/java")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
